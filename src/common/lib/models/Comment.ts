@@ -1,5 +1,5 @@
 // models/Comment.js
-import mongoose, { Schema } from "mongoose";
+import mongoose, { InferSchemaType, Schema, Types } from "mongoose";
 
 const commentSchema = new Schema(
   {
@@ -15,6 +15,11 @@ const commentSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export type BasePost = InferSchemaType<typeof commentSchema>;
+export type CommentType = BasePost & {
+  _id: Types.ObjectId;
+};
 
 export default mongoose.models.Comment ||
   mongoose.model("Comment", commentSchema);
