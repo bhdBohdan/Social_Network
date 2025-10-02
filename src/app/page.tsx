@@ -8,23 +8,24 @@ export default async function Home() {
 
   console.log(session?.user);
 
-  if (!session)
-    return (
-      <>
-        <Link href="/api/auth/signin">Sign In</Link>
-
-        <p>Not signed in</p>
-      </>
-    );
-
   return (
     <div className="p-5 m-5">
+      {!session && (
+        <Link
+          className="mb-9 flex w-25 justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+          href="/api/auth/signin"
+        >
+          Sign in
+        </Link>
+      )}
+
       <Link
         className="mb-9 flex w-25 justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-        href="/api/auth/signout"
+        href="/posts/add"
       >
-        Sign Out
+        Add post
       </Link>
+
       <h1>Welcome {session?.user?.name}!</h1>
       <p>Email: {session?.user?.email}</p>
       <p>Email: {session?.user?.firstName}</p>

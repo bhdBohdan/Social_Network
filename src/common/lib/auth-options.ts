@@ -12,31 +12,27 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials.password) return null;
+        console.log("authorize called with:", credentials);
+        if (!credentials?.email || !credentials.password) return null;
 
-          const user = await User.findOne({ email: credentials.email });
-          if (!user) return null;
+        const user = await User.findOne({ email: credentials.email });
+        console.log("found user:", user);
+        if (!user) return null;
 
-          const valid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-          if (!valid) return null;
+        const valid = await bcrypt.compare(credentials.password, user.password);
+        console.log("password valid:", valid);
+        if (!valid) return null;
 
-          // Return user object that will be encoded in the JWT
-          return {
-            id: user.id.toString(),
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            interests: user.interests,
-            ppUrl: user.ppUrl,
-          };
-        } catch (error) {
-          console.error("Authorization error:", error);
-          return null;
-        }
+        const result = {
+          id: user.id.toString(),
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          interests: user.interests,
+          ppUrl: user.ppUrl,
+        };
+        console.log("authorize returning:", result);
+        return result;
       },
     }),
   ],
@@ -46,7 +42,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       console.log("JWT callback - user:", user); // Debug log
-      console.log("JWT callback - token before:", token); // Debug log
+      // console.log("JWT callback - token before:", token); // Debug log
 
       // Initial sign in - user exists
       if (user) {
@@ -70,13 +66,13 @@ export const authOptions: NextAuthOptions = {
         token.interests = token.interests;
       }
 
-      console.log("JWT callback - token after:", token); // Debug log
+      // console.log("JWT callback - token after:", token); // Debug log
       return token;
     },
 
     async session({ session, token }) {
       console.log("Session callback - token:", token); // Debug log
-      console.log("Session callback - session before:", session); // Debug log
+      // console.log("Session callback - session before:", session); // Debug log
 
       if (token && session.user) {
         session.user.id = token.id as string;

@@ -1,0 +1,44 @@
+"use client";
+
+import { useState } from "react";
+
+export default function ReactionButton({
+  postId,
+  userId,
+  reactionsCount,
+  onReacted,
+}: {
+  postId: string;
+  userId: string;
+  reactionsCount: number;
+  onReacted?: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function toggleReaction() {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/posts/${postId}/reaction`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, type: "like" }),
+      });
+      if (!res.ok) throw new Error("Failed to react");
+      onReacted?.();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      onClick={toggleReaction}
+      disabled={loading}
+      className="bg-gray-200 rounded px-2 py-1 text-sm hover:bg-gray-300 disabled:opacity-50"
+    >
+      👍 {reactionsCount}
+    </button>
+  );
+}

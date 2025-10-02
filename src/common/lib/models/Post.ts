@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { InferSchemaType, Schema, Types } from "mongoose";
 
 const postSchema = new Schema(
   {
@@ -13,5 +13,10 @@ const postSchema = new Schema(
   },
   { timestamps: true }
 );
+
+export type BasePost = InferSchemaType<typeof postSchema>;
+export type PostType = BasePost & {
+  _id: Types.ObjectId;
+};
 
 export default mongoose.models.Post || mongoose.model("Post", postSchema);
