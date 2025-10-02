@@ -11,12 +11,6 @@ export default async function EditPostPage({
   if (!post) return <p>Post not found</p>;
 
   return (
-    <EditPostForm
-      postId={post._id.toString()}
-      initialContent={post.content}
-      onUpdated={() => {
-        redirect(`/posts/${post._id.toString()}`);
-      }}
-    />
+    <EditPostForm postId={post._id.toString()} initialContent={post.content} />
   );
 }
