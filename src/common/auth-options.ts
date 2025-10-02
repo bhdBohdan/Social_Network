@@ -2,6 +2,7 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import User from "@/common/lib/models/User";
+import connectDB from "./lib/mongo.db";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,6 +16,7 @@ export const authOptions: NextAuthOptions = {
         console.log("authorize called with:", credentials);
         if (!credentials?.email || !credentials.password) return null;
 
+        await connectDB();
         const user = await User.findOne({ email: credentials.email });
         console.log("found user:", user);
         if (!user) return null;

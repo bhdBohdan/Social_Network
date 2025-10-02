@@ -4,6 +4,7 @@ import Post from "@/common/lib/models/Post";
 
 export async function GET() {
   await dbConnect();
+  setTimeout(() => {}, 1500);
   const posts = await Post.find().populate("author reactions.user");
   return NextResponse.json(posts);
 }

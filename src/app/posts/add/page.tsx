@@ -1,10 +1,14 @@
-import { authOptions } from "@/common/lib/auth-options";
+import { authOptions } from "@/common/auth-options";
 import AddPostForm from "@/components/AddPostForm";
 import { getServerSession } from "next-auth";
 
 export default async function AddPostPage() {
   const session = await getServerSession(authOptions);
-  const userId = session?.user?.id || null;
+  const user = session?.user || null;
 
-  return <AddPostForm userId={userId} />;
+  return (
+    <div className="p-14">
+      <AddPostForm user={user} />
+    </div>
+  );
 }
