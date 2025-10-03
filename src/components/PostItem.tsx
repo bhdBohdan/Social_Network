@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { MessageSquareMore } from "lucide-react";
 import { Post } from "@/common/interfaces/Post.interface";
 import ReactionButton from "./ReactionButton";
 import Link from "next/link";
@@ -12,6 +14,31 @@ type ItemProps = {
 };
 
 export default function PostItem({ post, userId, fetchPosts }: ItemProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [content, setContent] = useState(post.content);
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/posts/${post._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update post");
+
+      await fetchPosts();
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      alert("Could not update post.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       key={post._id}
@@ -31,60 +58,93 @@ export default function PostItem({ post, userId, fetchPosts }: ItemProps) {
           </div>
         )}
         <div>
-          <p className="text-sm font-medium text-gray-700 dark:text-stone-200">
+          <Link
+            href={`/profile/${post.author._id}`}
+            className="text-sm font-medium text-gray-700 dark:text-stone-200"
+          >
             {post.author.firstName} {post.author.lastName}
-          </p>
+          </Link>
           <p className="text-xs text-gray-500 dark:text-stone-400">
-            {/* {new Date(post.createdAt).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })} */}
+            {/* timestamp here if needed */}
           </p>
         </div>
       </div>
 
       {/* Post Content */}
-      <p className="text-gray-800 dark:text-stone-200 text-lg leading-relaxed mb-4 whitespace-pre-wrap">
-        {post.content}
-      </p>
+      {isEditing ? (
+        <textarea
+          className="w-full p-3 text-base rounded-md border border-gray-300 dark:border-stone-600 dark:bg-stone-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={4}
+        />
+      ) : (
+        <p className="text-gray-800 dark:text-stone-200 text-lg leading-relaxed mb-4 whitespace-pre-wrap">
+          {post.content}
+        </p>
+      )}
 
       {/* Actions Row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ReactionButton
-            postId={post._id}
+            targetId={post._id}
             userId={userId}
             reactionsCount={post.reactions.length}
             onReacted={fetchPosts}
+            type="post"
           />
+          <Link href={`/posts/${post._id}`}>
+            <MessageSquareMore size={30} />
+          </Link>
         </div>
 
         {/* Author Actions */}
         {post.author._id === userId && (
           <div className="flex items-center gap-2">
-            <Link
-              href={`/posts/${post._id}/edit`}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
-              Edit
-            </Link>
-
-            <DeletePostButton postId={post._id} onDeleted={fetchPosts} />
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  disabled={loading}
+                  className="px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition disabled:opacity-50"
+                >
+                  {loading ? "Saving..." : "Save"}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setContent(post.content); // reset
+                  }}
+                  className="px-3 py-2 text-sm text-gray-600 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 dark:text-stone-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  Edit
+                </button>
+                <DeletePostButton postId={post._id} onDeleted={fetchPosts} />
+              </>
+            )}
           </div>
         )}
       </div>

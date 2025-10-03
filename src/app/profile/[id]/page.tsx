@@ -1,27 +1,79 @@
 import { authOptions } from "@/common/auth-options";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Key } from "react";
 
-export default async function Profile() {
+interface User {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  ppUrl?: string;
+  interests: string[];
+  followers: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ProfilePageProps {
+  params: {
+    id: string;
+  };
+}
+
+async function getUserData(userId: string): Promise<User | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/users/${userId}`,
+      {
+        cache: "no-store", // Ensure fresh data
+      }
+    );
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return null;
+      }
+      throw new Error("Failed to fetch user data");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
+}
+
+export default async function Profile({ params }: ProfilePageProps) {
   const session = await getServerSession(authOptions);
 
-  setTimeout(() => {
-    if (!session) redirect("/api/auth/signin");
-  }, 1500);
+  if (session && session.user?.id === params.id) {
+    redirect("/profile");
+  }
 
-  if (!session) {
+  const user = await getUserData(params.id);
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-white dark:bg-stone-900 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Please sign in to view your profile
+            User not found
           </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            The user you're looking for doesn't exist.
+          </p>
         </div>
       </div>
     );
   }
+
+  const isOwnProfile = session?.user.id === user._id;
+  const memberSince = new Date(user.createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-stone-900 py-8 px-4 sm:px-6 lg:px-8">
@@ -34,8 +86,8 @@ export default async function Profile() {
               <div className="flex-shrink-0">
                 <div className="relative">
                   <img
-                    src={session?.user?.ppUrl || "/default-avatar.png"}
-                    alt="Profile"
+                    src={user.ppUrl || "/default-avatar.png"}
+                    alt={`${user.firstName} ${user.lastName}'s profile`}
                     className="w-32 h-32 rounded-2xl object-cover border-4 border-white dark:border-stone-800 shadow-lg"
                   />
                   <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/10 dark:ring-white/10"></div>
@@ -45,10 +97,10 @@ export default async function Profile() {
               {/* Profile Information */}
               <div className="flex-1 text-center md:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {session?.user?.firstName} {session?.user?.lastName}
+                  {user.firstName} {user.lastName}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">
-                  {session?.user?.email}
+                  {user.email}
                 </p>
 
                 {/* Interests */}
@@ -56,9 +108,9 @@ export default async function Profile() {
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
                     Interests
                   </h3>
-                  {session?.user?.interests ? (
+                  {user.interests && user.interests.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {session.user.interests.map(
+                      {user.interests.map(
                         (interest: string, index: Key | null | undefined) => (
                           <span
                             key={index}
@@ -80,7 +132,7 @@ export default async function Profile() {
                 <div className="mt-8 grid grid-cols-2 gap-4 max-w-xs">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {/* Add your actual stats here */}0
+                      {/* add posts count here when you have the data */}0
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
                       Posts
@@ -88,7 +140,7 @@ export default async function Profile() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {/* Add your actual stats here */}0
+                      {user.followers.length}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
                       Followers
@@ -99,14 +151,23 @@ export default async function Profile() {
             </div>
 
             {/* Action Buttons */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-              <Link
-                href="/profile/edit"
-                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-stone-800 transition-colors duration-200"
-              >
-                Edit Profile
-              </Link>
-            </div>
+            {isOwnProfile && (
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <button className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-stone-800 transition-colors duration-200">
+                  Edit Profile
+                </button>
+                <button className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-stone-600 text-base font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-white dark:bg-stone-700 hover:bg-gray-50 dark:hover:bg-stone-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-stone-800 transition-colors duration-200">
+                  Share Profile
+                </button>
+              </div>
+            )}
+            {!isOwnProfile && (
+              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
+                <button className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-stone-800 transition-colors duration-200">
+                  Follow
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -148,10 +209,15 @@ export default async function Profile() {
                   Member since
                 </dt>
                 <dd className="text-sm text-gray-900 dark:text-white">
-                  {new Date().toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {memberSince}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  Last updated
+                </dt>
+                <dd className="text-sm text-gray-900 dark:text-white">
+                  {new Date(user.updatedAt).toLocaleDateString()}
                 </dd>
               </div>
               <div>
@@ -162,14 +228,16 @@ export default async function Profile() {
                   Active
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Email status
-                </dt>
-                <dd className="text-sm text-green-600 dark:text-green-400">
-                  Verified
-                </dd>
-              </div>
+              {isOwnProfile && (
+                <div>
+                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Email status
+                  </dt>
+                  <dd className="text-sm text-green-600 dark:text-green-400">
+                    Verified
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
         </div>

@@ -3,10 +3,16 @@ import dbConnect from "@/common/lib/mongo.db";
 import Post from "@/common/lib/models/Post";
 
 export async function GET() {
-  await dbConnect();
-  setTimeout(() => {}, 1500);
-  const posts = await Post.find().populate("author reactions.user");
-  return NextResponse.json(posts);
+  try {
+    await dbConnect();
+    const posts = await Post.find()
+      .populate("author reactions.user")
+      .sort({ createdAt: -1 });
+    return NextResponse.json(posts);
+  } catch (err) {
+    console.error("GET /api/posts error:", err);
+    return NextResponse.json([]);
+  }
 }
 
 export async function POST(req: Request) {

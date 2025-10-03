@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DeletePostButton from "./DeletePostButton";
-import EditPostForm from "./EditPostForm";
-import ReactionButton from "./ReactionButton";
-import Link from "next/link";
+
 import { Post } from "@/common/interfaces/Post.interface";
 import PostItem from "./PostItem";
 import { PostsSkeleton } from "./PostsSkeleton";

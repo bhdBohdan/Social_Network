@@ -3,14 +3,16 @@
 import { useState } from "react";
 
 export default function ReactionButton({
-  postId,
+  targetId,
   userId,
   reactionsCount,
+  type, // "post" | "comment"
   onReacted,
 }: {
-  postId: string;
+  targetId: string;
   userId: string;
   reactionsCount: number;
+  type: "post" | "comment";
   onReacted?: () => void;
 }) {
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ export default function ReactionButton({
   async function toggleReaction() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/posts/${postId}/reaction`, {
+      const res = await fetch(`/api/${type}s/${targetId}/reaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, type: "like" }),
@@ -37,7 +39,7 @@ export default function ReactionButton({
     <button
       onClick={toggleReaction}
       disabled={loading}
-      className="bg-gray-200 text-black dark:text-white dark:bg-gray-800 rounded px-2 py-1 text-sm hover:bg-gray-300  dark:hover:bg-gray-900 disabled:opacity-50"
+      className="bg-gray-200 text-black dark:text-white dark:bg-gray-800 rounded px-2 py-1 text-sm hover:bg-gray-300 dark:hover:bg-gray-900 disabled:opacity-50"
     >
       👍 {reactionsCount}
     </button>
