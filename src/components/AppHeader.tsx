@@ -16,9 +16,13 @@ export default function AppHeader() {
       <header className="flex items-center justify-between px-6 py-3 bg-gray-100 dark:bg-stone-900 text-white shadow-md">
         <Link
           href="/"
-          className="text-lg text-indigo-500 font-bold hover:text-indigo-400 dark:text-indigo-200"
+          className="flex flex-row items-center text-lg text-indigo-500 font-bold hover:text-indigo-400 dark:text-indigo-200"
         >
-          MyApp
+          <img
+            className="w-15 h-15 mr-1.5 rounded-full  object-cover"
+            src="https://i.pinimg.com/736x/3e/cd/67/3ecd67142c701d0af178b4cf6528ffcf.jpg"
+          />
+          BhdBlogs
         </Link>
 
         <div className="flex items-center gap-4">

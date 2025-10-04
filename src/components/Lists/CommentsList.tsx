@@ -56,6 +56,7 @@ export default function CommentsList({ postId, userId }: CommentsListProps) {
         <div className="flex flex-col gap-3 p-9 m-3">
           {comments.map((comment) => (
             <CommentItem
+              key={comment._id.toString()}
               comment={comment}
               fetchComments={fetchComments}
               userId={userId || ""}

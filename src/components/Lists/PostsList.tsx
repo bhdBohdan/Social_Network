@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 
 import { Post } from "@/common/interfaces/Post.interface";
-import PostItem from "./PostItem";
-import { Skeleton } from "./Skeleton";
+import { Skeleton } from "../Skeleton";
+import PostItem from "../Items/PostItem";
 
 export default function PostsList({ userId }: { userId: string }) {
   const [posts, setPosts] = useState<Post[]>([]);

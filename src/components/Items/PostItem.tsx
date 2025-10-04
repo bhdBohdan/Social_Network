@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { MessageSquareMore } from "lucide-react";
 import { Post } from "@/common/interfaces/Post.interface";
-import ReactionButton from "./ReactionButton";
 import Link from "next/link";
-import DeletePostButton from "./DeletePostButton";
+import DeletePostButton from "../Buttons/DeletePostButton";
+import ReactionButton from "../Buttons/ReactionButton";
 
 type ItemProps = {
   post: Post;

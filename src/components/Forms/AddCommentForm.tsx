@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { User } from "next-auth";
+import { useRouter } from "next/navigation";
 
 export default function CommentAddForm({
   userId,
@@ -15,13 +16,14 @@ export default function CommentAddForm({
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    if (!userId) {
-      setError("You must be logged in to comment.");
+    if (!userId || userId === "") {
+      router.push("/signin");
       return <></>;
     }
 

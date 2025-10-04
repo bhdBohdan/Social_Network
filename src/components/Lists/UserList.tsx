@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Skeleton } from "./Skeleton";
+import { Skeleton } from "../Skeleton";
 
 interface UserResponse {
   _id: string;
