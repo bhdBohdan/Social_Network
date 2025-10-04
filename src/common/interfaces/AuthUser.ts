@@ -32,6 +32,18 @@ export interface IUser {
   updatedAt: Date;
 }
 
+export interface UserInfo {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  ppUrl?: string;
+  interests: string[];
+  followers: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface UpdateUser {
   firstName: string;
   lastName: string;

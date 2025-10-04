@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import Comment from "@/common/lib/models/Comment";
-import connectDB from "@/common/lib/mongo.db";
+import Comment from "@/common/db/models/Comment";
+import connectDB from "@/common/db/mongo.db";
 
 // GET /api/comments?postId=123
 export async function GET(req: Request) {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
     const newComment = await Comment.create({
       author,
-      post, // link to Post
+      post,
       content,
     });
 

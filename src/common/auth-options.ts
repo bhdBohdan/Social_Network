@@ -1,8 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import User from "@/common/lib/models/User";
-import connectDB from "./lib/mongo.db";
+import User from "@/common/db/models/User";
+import connectDB from "./db/mongo.db";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -32,6 +32,9 @@ export const authOptions: NextAuthOptions = {
           lastName: user.lastName,
           interests: user.interests,
           ppUrl: user.ppUrl,
+          followers: user.followers
+            ? user.followers.map((f: any) => f.toString())
+            : [],
         };
         console.log("authorize returning:", result);
         return result;
@@ -54,10 +57,10 @@ export const authOptions: NextAuthOptions = {
         token.image = user.ppUrl; // Map to image
         token.ppUrl = user.ppUrl;
         token.interests = user.interests;
+        token.followers = user.followers;
       }
 
       // Subsequent calls - user is undefined, but we need to preserve custom fields
-      // Make sure we always return the token with our custom fields
       if (!user && token) {
         // Ensure our custom fields persist
         token.id = token.id;
@@ -66,23 +69,32 @@ export const authOptions: NextAuthOptions = {
         token.image = token.ppUrl; // Keep image mapped
         token.ppUrl = token.ppUrl;
         token.interests = token.interests;
+        token.followers = token.followers;
       }
 
-      // console.log("JWT callback - token after:", token); // Debug log
+      if (trigger === "update" && session) {
+        token.firstName = session.firstName ?? token.firstName;
+        token.lastName = session.lastName ?? token.lastName;
+        token.ppUrl = session.ppUrl ?? token.ppUrl;
+        token.interests = session.interests ?? token.interests;
+      }
+
+      // console.log("JWT callback - token after:", token);
       return token;
     },
 
     async session({ session, token }) {
-      console.log("Session callback - token:", token); // Debug log
-      // console.log("Session callback - session before:", session); // Debug log
+      console.log("Session callback - token:", token);
+      // console.log("Session callback - session before:", session);
 
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.firstName = token.firstName as string;
         session.user.lastName = token.lastName as string;
-        session.user.image = token.image as string; // Use image field
+        session.user.image = token.image as string;
         session.user.ppUrl = token.ppUrl as string;
         session.user.interests = token.interests as string[];
+        session.user.followers = token.followers as string[];
       }
 
       console.log("Session callback - session after:", session); // Debug log

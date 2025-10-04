@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Post } from "@/common/interfaces/Post.interface";
 import PostItem from "./PostItem";
-import { PostsSkeleton } from "./PostsSkeleton";
+import { Skeleton } from "./Skeleton";
 
 export default function PostsList({ userId }: { userId: string }) {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -23,7 +23,7 @@ export default function PostsList({ userId }: { userId: string }) {
   }, []);
 
   return loading ? (
-    <PostsSkeleton />
+    <Skeleton />
   ) : (
     <div className="flex flex-col gap-4">
       {posts.map((post) => (

@@ -1,19 +1,9 @@
 import { authOptions } from "@/common/auth-options";
+import { UserInfo } from "@/common/interfaces/AuthUser";
+import FollowButton from "@/components/Buttons/FollowButton";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Key } from "react";
-
-interface User {
-  _id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  ppUrl?: string;
-  interests: string[];
-  followers: string[];
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface ProfilePageProps {
   params: {
@@ -21,7 +11,7 @@ interface ProfilePageProps {
   };
 }
 
-async function getUserData(userId: string): Promise<User | null> {
+async function getUserData(userId: string): Promise<UserInfo | null> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_APP_URL}/api/users/${userId}`,
@@ -69,6 +59,10 @@ export default async function Profile({ params }: ProfilePageProps) {
   }
 
   const isOwnProfile = session?.user.id === user._id;
+  const isFollowing = session
+    ? user.followers.includes(session.user.id)
+    : false;
+
   const memberSince = new Date(user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -161,11 +155,13 @@ export default async function Profile({ params }: ProfilePageProps) {
                 </button>
               </div>
             )}
-            {!isOwnProfile && (
+            {!isOwnProfile && session?.user?.id && (
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center md:justify-start">
-                <button className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-stone-800 transition-colors duration-200">
-                  Follow
-                </button>
+                <FollowButton
+                  userId={user._id}
+                  currentUserId={session.user.id}
+                  isFollowing={isFollowing}
+                />
               </div>
             )}
           </div>

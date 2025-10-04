@@ -1,5 +1,5 @@
-import { getPostById } from "@/common/lib/post";
-import EditPostForm from "@/components/EditPostForm";
+import { getPostById } from "@/common/db/post";
+import EditPostForm from "@/components/Forms/EditPostForm";
 import { redirect } from "next/navigation";
 
 export default async function EditPostPage({

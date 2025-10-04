@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/common/lib/mongo.db";
-import Post from "@/common/lib/models/Post";
-import Comment from "@/common/lib/models/Comment";
+import dbConnect from "@/common/db/mongo.db";
+import Post from "@/common/db/models/Post";
+import Comment from "@/common/db/models/Comment";
 
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   await dbConnect();

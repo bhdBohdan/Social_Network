@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/common/lib/mongo.db";
-import Comment from "@/common/lib/models/Comment"; // ✅ make sure you have this model
+import dbConnect from "@/common/db/mongo.db";
+import Comment from "@/common/db/models/Comment"; // ✅ make sure you have this model
 import { Reaction } from "@/common/interfaces/Reaction";
 
 export async function POST(

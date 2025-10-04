@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Comment } from "@/common/interfaces/Comment.interface";
-import ReactionButton from "./ReactionButton";
-import DeleteCommentButton from "./DeleteCommentButton";
+import ReactionButton from "../Buttons/ReactionButton";
+import DeleteCommentButton from "../Buttons/DeleteCommentButton";
 import Link from "next/link";
 
 type CommentItemProps = {

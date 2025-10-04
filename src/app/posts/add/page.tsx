@@ -1,5 +1,5 @@
 import { authOptions } from "@/common/auth-options";
-import AddPostForm from "@/components/AddPostForm";
+import AddPostForm from "@/components/Forms/AddPostForm";
 import { getServerSession } from "next-auth";
 
 export default async function AddPostPage() {

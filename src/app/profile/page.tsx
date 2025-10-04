@@ -80,7 +80,7 @@ export default async function Profile() {
                 <div className="mt-8 grid grid-cols-2 gap-4 max-w-xs">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {/* Add your actual stats here */}0
+                      {/* No need to implement*/}0
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
                       Posts
@@ -88,7 +88,7 @@ export default async function Profile() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {/* Add your actual stats here */}0
+                      {session.user.followers.length || 0}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">
                       Followers

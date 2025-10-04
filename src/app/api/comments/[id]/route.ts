@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import Comment from "@/common/lib/models/Comment";
-import connectDB from "@/common/lib/mongo.db";
+import Comment from "@/common/db/models/Comment";
+import connectDB from "@/common/db/mongo.db";
 
 // DELETE /api/comments/:id
 export async function DELETE(

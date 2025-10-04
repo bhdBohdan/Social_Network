@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ReactionButton from "./ReactionButton";
+import ReactionButton from "../Buttons/ReactionButton";
 import Link from "next/link";
 import { Comment } from "@/common/interfaces/Comment.interface";
-import CommentItem from "./CommentsItem";
-import CommentAddForm from "./AddCommentForm";
+import CommentItem from "../Items/CommentsItem";
+import CommentAddForm from "../Forms/AddCommentForm";
+import { Skeleton } from "../Skeleton";
 
 // Props
 interface CommentsListProps {
@@ -44,7 +45,11 @@ export default function CommentsList({ postId, userId }: CommentsListProps) {
         userId={userId || ""}
         onAdded={fetchComments}
       />
-      {loading && <p className="text-gray-400">Loading comments...</p>}
+      {loading && (
+        <div className="flex flex-col gap-3 p-9 m-3">
+          <Skeleton />
+        </div>
+      )}
       {!loading && !comments.length ? (
         <p className="text-gray-500">No comments yet</p>
       ) : (

@@ -1,6 +1,8 @@
 import Post, { PostType } from "./models/Post";
 import connectDB from "./mongo.db";
 
+//utils for server components
+
 export async function getPosts() {
   await connectDB();
   const posts = await Post.find().populate("author reactions.user");

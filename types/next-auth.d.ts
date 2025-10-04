@@ -8,6 +8,7 @@ declare module "next-auth" {
     lastName: string;
     ppUrl?: string;
     interests: string[];
+    followers: string[];
   }
 
   interface Session {
@@ -23,5 +24,6 @@ declare module "next-auth/jwt" {
     lastName: string;
     ppUrl?: string;
     interests: string[];
+    followers: string[];
   }
 }
