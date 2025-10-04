@@ -5,12 +5,9 @@ import User from "@/common/db/models/User";
 import { UpdateUser } from "@/common/interfaces/AuthUser";
 
 // GET /api/users/:id
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: Request, { params }: any) {
   try {
-    const { id } = params;
+    const { id } = await params;
     await connectDB();
 
     if (!Types.ObjectId.isValid(id)) {
@@ -30,15 +27,14 @@ export async function GET(
 }
 
 // PUT /api/users/:id
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: Request, { params }: any) {
   try {
     await connectDB();
+    const { id } = await params;
+
     const body: UpdateUser = await req.json();
 
-    if (!Types.ObjectId.isValid(params.id)) {
+    if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
     }
 

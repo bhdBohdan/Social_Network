@@ -3,13 +3,10 @@ import dbConnect from "@/common/db/mongo.db";
 import Comment from "@/common/db/models/Comment"; // ✅ make sure you have this model
 import { Reaction } from "@/common/interfaces/Reaction";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: Request, context: any) {
   await dbConnect();
 
-  const { id } = params;
+  const { id } = context.params;
   const { userId, type } = await req.json();
 
   if (!userId) {
