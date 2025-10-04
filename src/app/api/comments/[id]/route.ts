@@ -3,12 +3,9 @@ import Comment from "@/common/db/models/Comment";
 import connectDB from "@/common/db/mongo.db";
 
 // DELETE /api/comments/:id
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: Request, context: any) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     await connectDB();
     await Comment.findByIdAndDelete(id);
 
@@ -23,12 +20,9 @@ export async function DELETE(
 }
 
 // PATCH /api/comments/:id (edit content)
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: Request, context: any) {
   try {
-    const { id } = params;
+    const { id } = context.params;
     await connectDB();
     const body = await req.json();
 

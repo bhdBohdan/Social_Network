@@ -3,10 +3,7 @@ import dbConnect from "@/common/db/mongo.db";
 import Post from "@/common/db/models/Post";
 import { Reaction } from "@/common/interfaces/Reaction";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: Request, { params }: any) {
   await dbConnect();
   const { userId, type } = await req.json();
   const { id } = await params;

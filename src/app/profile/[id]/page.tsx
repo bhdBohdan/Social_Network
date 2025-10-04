@@ -6,9 +6,7 @@ import { redirect } from "next/navigation";
 import { Key } from "react";
 
 interface ProfilePageProps {
-  params: {
-    id: string;
-  };
+  params: any;
 }
 
 async function getUserData(userId: string): Promise<UserInfo | null> {
@@ -51,7 +49,7 @@ export default async function Profile({ params }: ProfilePageProps) {
             User not found
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            The user you're looking for doesn't exist.
+            The user you&apos;re looking for doesn&apos;t exist.
           </p>
         </div>
       </div>
@@ -81,7 +79,7 @@ export default async function Profile({ params }: ProfilePageProps) {
                 <div className="relative">
                   <img
                     src={user.ppUrl || "/default-avatar.png"}
-                    alt={`${user.firstName} ${user.lastName}'s profile`}
+                    alt={`${user.firstName} ${user.lastName}&apos;s profile`}
                     className="w-32 h-32 rounded-2xl object-cover border-4 border-white dark:border-stone-800 shadow-lg"
                   />
                   <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/10 dark:ring-white/10"></div>

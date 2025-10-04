@@ -3,15 +3,13 @@ import { Types } from "mongoose";
 import User from "@/common/db/models/User";
 import connectDB from "@/common/db/mongo.db";
 
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: Request, { params }: any) {
   try {
+    const { id } = await params;
     await connectDB();
 
     const { currentUserId } = await req.json();
-    const targetUserId = params.id;
+    const targetUserId = id;
 
     // Validate IDs
     if (

@@ -33,7 +33,10 @@ export default function UsersList({ userId }: { userId?: string }) {
   ) : (
     <div className="flex flex-col gap-4">
       {users.map((user) => (
-        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-stone-700">
+        <div
+          key={user._id}
+          className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-stone-700"
+        >
           {user.ppUrl ? (
             <img
               className="w-8 h-8 rounded-full border border-gray-200 dark:border-stone-600"

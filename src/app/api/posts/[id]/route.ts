@@ -3,7 +3,7 @@ import dbConnect from "@/common/db/mongo.db";
 import Post from "@/common/db/models/Post";
 import Comment from "@/common/db/models/Comment";
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, { params }: any) {
   await dbConnect();
   const { id } = await params;
 
@@ -13,10 +13,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   return NextResponse.json(post);
 }
 
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: Request, { params }: any) {
   await dbConnect();
   const { id } = await params;
 
@@ -27,10 +24,7 @@ export async function PUT(
   return NextResponse.json(post);
 }
 
-export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(_: Request, { params }: any) {
   await dbConnect();
   const { id } = await params;
 
