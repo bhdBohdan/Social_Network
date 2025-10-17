@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/common/db/mongo.db";
-import Post from "@/common/db/models/Post";
+import dbConnect from "@/common/mongoDB/mongo.db";
+import Post from "@/common/mongoDB/models/Post";
 
 export async function GET() {
   try {

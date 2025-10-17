@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import Comment from "@/common/db/models/Comment";
-import connectDB from "@/common/db/mongo.db";
+import Comment from "@/common/mongoDB/models/Comment";
+import connectDB from "@/common/mongoDB/mongo.db";
 
 // GET /api/comments?postId=123
 export async function GET(req: Request) {

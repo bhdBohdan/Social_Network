@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Types } from "mongoose";
-import connectDB from "@/common/db/mongo.db";
-import User from "@/common/db/models/User";
+import connectDB from "@/common/mongoDB/mongo.db";
+import User from "@/common/mongoDB/models/User";
 import { UpdateUser } from "@/common/interfaces/AuthUser";
 
 // GET /api/users/:id

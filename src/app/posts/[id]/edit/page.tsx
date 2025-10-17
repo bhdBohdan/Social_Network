@@ -1,4 +1,4 @@
-import { getPostById } from "@/common/db/post";
+import { getPostById } from "@/common/mongoDB/post";
 import EditPostForm from "@/components/Forms/EditPostForm";
 import { redirect } from "next/navigation";
 
