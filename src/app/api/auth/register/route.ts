@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import connectDB from "@/common/mongoDB/mongo.db";
 import User from "@/common/mongoDB/models/User";
+import { getNeo4jSession } from "@/common/neo4Jdb/neo4j";
 
 export async function POST(req: Request) {
+  const session = await getNeo4jSession();
   try {
     const { email, password, firstName, lastName, ppUrl, interests } =
       await req.json();
@@ -36,6 +38,11 @@ export async function POST(req: Request) {
       interests: interests || [],
     });
 
+    await session.run(`CREATE (u:User {id: $id, email: $email}) RETURN u`, {
+      id: newUser.id.toString(),
+      email,
+    });
+
     return NextResponse.json({
       message: "User created",
       user: {
@@ -51,5 +58,7 @@ export async function POST(req: Request) {
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
+  } finally {
+    await session.close();
   }
 }

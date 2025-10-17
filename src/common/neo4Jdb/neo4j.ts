@@ -5,6 +5,6 @@ const driver = neo4j.driver(
   neo4j.auth.basic(process.env.NEO4J_USERNAME!, process.env.NEO4J_PASSWORD!)
 );
 
-export async function getSession() {
+export async function getNeo4jSession() {
   return driver.session({ database: process.env.NEO4J_DATABASE! });
 }

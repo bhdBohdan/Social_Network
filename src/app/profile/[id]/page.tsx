@@ -4,6 +4,10 @@ import FollowButton from "@/components/Buttons/FollowButton";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Key } from "react";
+import {
+  getRelationshipStatus,
+  getDistanceBetweenUsers,
+} from "@/common/neo4Jdb/helpers";
 
 interface ProfilePageProps {
   params: any;
@@ -57,9 +61,38 @@ export default async function Profile({ params }: ProfilePageProps) {
   }
 
   const isOwnProfile = session?.user.id === user._id;
-  const isFollowing = session
+  const isFollowingFromMongo = session
     ? user.followers.includes(session.user.id)
     : false;
+
+  // srver-side Neo4j checks
+  let neo4jRel = { isFollowing: false, isFollowedBy: false, isMutual: false };
+  let distance: number | null = null;
+  if (session && !isOwnProfile) {
+    try {
+      const [rel, d] = await Promise.all([
+        getRelationshipStatus(session.user.id, user._id).catch(() => ({
+          isFollowing: false,
+          isFollowedBy: false,
+          isMutual: false,
+        })),
+        getDistanceBetweenUsers(session.user.id, user._id).catch(() => null),
+      ]);
+      neo4jRel = rel;
+
+      distance = typeof d === "number" ? d : d === null ? null : Number(d);
+    } catch (e) {
+      console.error("Neo4j check failed:", e);
+    }
+  }
+
+  const isFollowing = session
+    ? neo4jRel
+      ? !!neo4jRel.isFollowing
+      : isFollowingFromMongo
+    : false;
+  const isMutual = !!neo4jRel.isMutual;
+  const isFollowedBy = !!neo4jRel.isFollowedBy;
 
   const memberSince = new Date(user.createdAt).toLocaleDateString("en-US", {
     year: "numeric",
@@ -90,6 +123,29 @@ export default async function Profile({ params }: ProfilePageProps) {
               <div className="flex-1 text-center md:text-left">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {user.firstName} {user.lastName}
+                  {session && !isOwnProfile && (
+                    <span className="ml-3 text-sm inline-flex items-center gap-2 px-2 py-1 rounded bg-gray-100 dark:bg-stone-700 text-gray-700 dark:text-gray-200">
+                      {isMutual ? (
+                        <strong>Friend</strong>
+                      ) : isFollowedBy ? (
+                        <strong>Follows you</strong>
+                      ) : isFollowing ? (
+                        <strong>Following</strong>
+                      ) : distance == 2 ? (
+                        <strong>Friend of your friend</strong>
+                      ) : (
+                        "Not following"
+                      )}
+                      {isMutual && (
+                        <span className="text-xs text-cyan-600">• Mutual</span>
+                      )}
+                      {distance !== null && (
+                        <span className="text-xs text-gray-500 ml-1">
+                          • dist: {distance}
+                        </span>
+                      )}
+                    </span>
+                  )}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">
                   {user.email}
@@ -160,6 +216,16 @@ export default async function Profile({ params }: ProfilePageProps) {
                   currentUserId={session.user.id}
                   isFollowing={isFollowing}
                 />
+                <div className="ml-3 self-center text-sm text-gray-600 dark:text-gray-300">
+                  {isMutual
+                    ? "Mutual follow"
+                    : neo4jRel.isFollowedBy
+                    ? "Follows you"
+                    : "Not following you"}
+                  {distance !== null && (
+                    <span className="ml-2">• distance {distance}</span>
+                  )}
+                </div>
               </div>
             )}
           </div>

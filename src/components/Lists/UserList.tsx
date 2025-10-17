@@ -1,8 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Skeleton } from "../Skeleton";
+import { getRelationshipStatus } from "@/common/neo4Jdb/helpers";
 
 interface UserResponse {
   _id: string;
@@ -12,25 +10,42 @@ interface UserResponse {
   followers: string[];
 }
 
-export default function UsersList({ userId }: { userId?: string }) {
-  const [users, setusers] = useState<UserResponse[]>([]);
-  const [loading, setLoading] = useState(false);
+export default async function UsersList({ userId }: { userId?: string }) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/users`,
+    {
+      cache: "no-store",
+    }
+  );
+  const users: UserResponse[] = await res.json();
 
-  async function fetchusers() {
-    setLoading(true);
-    const res = await fetch("/api/users", { cache: "no-store" });
-    const data = await res.json();
-    setusers(data);
-    setLoading(false);
+  const relMap: Record<
+    string,
+    { isFollowing: boolean; isFollowedBy: boolean; isMutual: boolean }
+  > = {};
+  if (userId && users.length) {
+    const checks = await Promise.all(
+      // not optimal, each call for each user
+      users.map((u) =>
+        getRelationshipStatus(userId, u._id).catch(() => ({
+          isFollowing: false,
+          isFollowedBy: false,
+          isMutual: false,
+        }))
+      )
+    );
+    checks.forEach((c, i) => {
+      relMap[users[i]._id] = {
+        isFollowing: !!c.isFollowing,
+        isMutual: !!c.isMutual,
+        isFollowedBy: !!c.isFollowedBy,
+      };
+    });
   }
 
-  useEffect(() => {
-    fetchusers();
-  }, []);
+  if (!users || users.length === 0) return <Skeleton />;
 
-  return loading ? (
-    <Skeleton />
-  ) : (
+  return (
     <div className="flex flex-col gap-4">
       {users.map((user) => (
         <div
@@ -54,13 +69,19 @@ export default function UsersList({ userId }: { userId?: string }) {
               className="text-sm font-medium text-gray-700 dark:text-stone-200"
             >
               {user.firstName}{" "}
-              {userId && user.followers.includes(userId) && (
-                <span className="font-bold text-cyan-600">Following</span>
+              {userId && relMap[user._id]?.isMutual ? (
+                <span className="font-bold text-pink-600">Friend</span>
+              ) : relMap[user._id]?.isFollowedBy ? (
+                <span className="font-bold text-green-600">Follows you</span>
+              ) : (
+                relMap[user._id]?.isFollowing && (
+                  <span className="font-bold text-cyan-600">Following</span>
+                )
+              )}
+              {userId === user._id && (
+                <span className="font-bold text-red-600">This is you</span>
               )}
             </Link>
-            <p className="text-xs text-gray-500 dark:text-stone-400">
-              {/* timestamp here if needed */}
-            </p>
           </div>
         </div>
       ))}

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 import User from "@/common/mongoDB/models/User";
 import connectDB from "@/common/mongoDB/mongo.db";
+import {
+  createFollowRelation,
+  deleteFollowRelation,
+} from "@/common/neo4Jdb/helpers";
 
 export async function PUT(req: Request, { params }: any) {
   try {
@@ -42,8 +46,10 @@ export async function PUT(req: Request, { params }: any) {
       targetUser.followers = targetUser.followers.filter(
         (f: Types.ObjectId) => f.toString() !== currentUserId
       );
+      await deleteFollowRelation(currentUserId, targetUserId);
     } else {
       targetUser.followers.push(new Types.ObjectId(currentUserId));
+      await createFollowRelation(currentUserId, targetUserId);
     }
 
     await targetUser.save();
