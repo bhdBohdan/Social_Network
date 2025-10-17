@@ -1,50 +1,70 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { z } from "zod";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+
+const schema = z.object({
+  email: z.email(),
+  password: z.string().min(8),
+  firstName: z.string().min(3),
+  lastName: z.string().min(3),
+  ppUrl: z.url(),
+});
+
+type FormFields = z.infer<typeof schema>;
 
 export default function RegistrationForm() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    ppUrl: "",
+  const {
+    handleSubmit,
+    register,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<FormFields>({
+    defaultValues: {
+      email: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+      ppUrl: "",
+    },
+    resolver: zodResolver(schema),
   });
-  const [msg, setMsg] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    // 1️⃣ Register the user first
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    const data = await res.json();
-    if (res.ok) {
-      setMsg("Registered successfully! Logging in...");
-
-      // log in
-      await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: true,
-        callbackUrl: "/", // redirect
+  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
-    } else {
-      setMsg(data.error);
-    }
-  }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  }
+      const payload = await res.json();
+
+      if (!res.ok) {
+        // attach server message to email field (adjust as needed)
+        setError("email", {
+          type: "server",
+          message: payload?.error || "Registration failed",
+        });
+        return;
+      }
+
+      // success -> sign in and redirect
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: true,
+        callbackUrl: "/",
+      });
+    } catch (err) {
+      setError("email", {
+        type: "server",
+        message: "Network error, please try again",
+      });
+    }
+  };
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -60,7 +80,11 @@ export default function RegistrationForm() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+          noValidate
+        >
           <div>
             <label className="block text-sm/6 font-medium text-gray-100">
               Email address
@@ -69,13 +93,16 @@ export default function RegistrationForm() {
               <input
                 id="email"
                 type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
+                {...register("email")}
+                aria-invalid={!!errors.email}
                 autoComplete="email"
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -89,13 +116,16 @@ export default function RegistrationForm() {
               <input
                 id="password"
                 type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
+                {...register("password")}
+                aria-invalid={!!errors.password}
                 autoComplete="new-password"
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -109,12 +139,15 @@ export default function RegistrationForm() {
               <input
                 id="firstName"
                 type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
+                {...register("firstName")}
+                aria-invalid={!!errors.firstName}
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
+              {errors.firstName && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.firstName.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -128,12 +161,15 @@ export default function RegistrationForm() {
               <input
                 id="lastName"
                 type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
+                {...register("lastName")}
+                aria-invalid={!!errors.lastName}
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
+              {errors.lastName && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.lastName.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -147,34 +183,27 @@ export default function RegistrationForm() {
               <input
                 id="ppUrl"
                 type="text"
-                name="ppUrl"
-                value={formData.ppUrl}
-                onChange={handleChange}
+                {...register("ppUrl")}
+                aria-invalid={!!errors.ppUrl}
                 className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
               />
+              {errors.ppUrl && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.ppUrl.message}
+                </p>
+              )}
             </div>
           </div>
 
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+              disabled={isSubmitting}
+              className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:opacity-60"
             >
-              Register
+              {isSubmitting ? "Registering..." : "Register"}
             </button>
           </div>
-
-          {msg && (
-            <div className="text-center">
-              <p
-                className={`text-sm ${
-                  msg.includes("error") ? "text-red-500" : "text-green-500"
-                }`}
-              >
-                {msg}
-              </p>
-            </div>
-          )}
         </form>
       </div>
     </div>
