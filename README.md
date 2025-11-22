@@ -1,6 +1,6 @@
 ### Social Network
 
-Stack: NextJs, Next-auth, Typescript, MongoDb, JWT, Bcrypt.
+Stack: NextJs, Next-auth, Typescript, Mongoose for MongoDb, Neo4j-driver, JWT, Bcrypt, ReactHookForm , Zod.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
