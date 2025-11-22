@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Skeleton } from "../Skeleton";
-import { getRelationshipStatus } from "@/common/neo4Jdb/helpers";
+import { getRelationshipStatus } from "@/databases/neo4Jdb/helpers";
 
 interface UserResponse {
   _id: string;

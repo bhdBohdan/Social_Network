@@ -7,7 +7,7 @@ import { Key } from "react";
 import {
   getRelationshipStatus,
   getDistanceBetweenUsers,
-} from "@/common/neo4Jdb/helpers";
+} from "@/databases/neo4Jdb/helpers";
 
 interface ProfilePageProps {
   params: any;

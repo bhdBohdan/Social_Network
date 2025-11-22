@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import connectDB from "@/common/mongoDB/mongo.db";
-import User from "@/common/mongoDB/models/User";
-import { getNeo4jSession } from "@/common/neo4Jdb/neo4j";
+import connectDB from "@/databases/mongoDB/mongo.db";
+import User from "@/databases/mongoDB/models/User";
+import { getNeo4jSession } from "@/databases/neo4Jdb/neo4j.db";
 
 export async function POST(req: Request) {
   const session = await getNeo4jSession();

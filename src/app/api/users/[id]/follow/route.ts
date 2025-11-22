@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { Types } from "mongoose";
-import User from "@/common/mongoDB/models/User";
-import connectDB from "@/common/mongoDB/mongo.db";
+import User from "@/databases/mongoDB/models/User";
+import connectDB from "@/databases/mongoDB/mongo.db";
 import {
   createFollowRelation,
   deleteFollowRelation,
-} from "@/common/neo4Jdb/helpers";
+} from "@/databases/neo4Jdb/helpers";
 
 export async function PUT(req: Request, { params }: any) {
   try {

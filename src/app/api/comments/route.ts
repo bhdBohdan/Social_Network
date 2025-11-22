@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import Comment from "@/common/mongoDB/models/Comment";
-import connectDB from "@/common/mongoDB/mongo.db";
+import Comment from "@/databases/mongoDB/models/Comment";
+import connectDB from "@/databases/mongoDB/mongo.db";
 import {
   createComment,
   getAllDataByPostId,
-} from "@/common/dynamoDB/dynamoHelpers";
+} from "@/databases/dynamoDB/dynamoHelpers";
 
 // GET /api/comments?postId=123
 export async function GET(req: Request) {

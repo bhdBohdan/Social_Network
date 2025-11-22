@@ -163,8 +163,6 @@ const updatedComment = await updateComment(
 );
 */
 
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
-
 /**
  * Отримує пост та всі його коментарі за ID поста.
  * @param postId ID поста.
@@ -210,8 +208,6 @@ if (postData.post) {
 }
 console.log("Коментарі:", postData.comments);
 */
-
-import { DeleteCommand } from "@aws-sdk/lib-dynamodb";
 
 /**
  * Видаляє існуючий Коментар з DynamoDB.

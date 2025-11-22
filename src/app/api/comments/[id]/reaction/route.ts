@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient, TABLE_NAME } from "@/common/dynamoDB/dynamo.db"; // Імпортуємо клієнт
+import { ddbDocClient, TABLE_NAME } from "@/databases/dynamoDB/dynamo.db"; // Імпортуємо клієнт
 
 interface ReactionRequest {
   postId: string;

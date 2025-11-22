@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import dbConnect from "@/common/mongoDB/mongo.db";
-import Post from "@/common/mongoDB/models/Post";
+import dbConnect from "@/databases/mongoDB/mongo.db";
+import Post from "@/databases/mongoDB/models/Post";
 import { Reaction } from "@/common/interfaces/Reaction";
 
 export async function POST(req: Request, { params }: any) {

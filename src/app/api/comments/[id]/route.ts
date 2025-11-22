@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import Comment from "@/common/mongoDB/models/Comment";
-import connectDB from "@/common/mongoDB/mongo.db";
-import { updateComment } from "@/common/dynamoDB/dynamoHelpers";
+import Comment from "@/databases/mongoDB/models/Comment";
+import connectDB from "@/databases/mongoDB/mongo.db";
+import { updateComment } from "@/databases/dynamoDB/dynamoHelpers";
 
 // DELETE /api/comments/:id
 export async function DELETE(req: Request, context: any) {

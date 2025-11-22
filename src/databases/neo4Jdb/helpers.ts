@@ -1,4 +1,4 @@
-import { getNeo4jSession } from "./neo4j";
+import { getNeo4jSession } from "./neo4j.db";
 
 export async function createFollowRelation(
   followerId: string,
