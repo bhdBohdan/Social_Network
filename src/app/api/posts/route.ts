@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/common/mongoDB/mongo.db";
 import Post from "@/common/mongoDB/models/Post";
+import { createComment } from "@/common/dynamoDB/dynamoHelpers";
 
 export async function GET() {
   try {
@@ -24,5 +25,11 @@ export async function POST(req: Request) {
   }
 
   const post = await Post.create({ author, content });
+  await createComment({
+    content: post.content,
+    post: post._id.toString(),
+    author: author._id.toString(),
+    reactions: [],
+  });
   return NextResponse.json(post, { status: 201 });
 }

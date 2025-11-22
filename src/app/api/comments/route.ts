@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import Comment from "@/common/mongoDB/models/Comment";
 import connectDB from "@/common/mongoDB/mongo.db";
+import {
+  createComment,
+  getAllDataByPostId,
+} from "@/common/dynamoDB/dynamoHelpers";
 
 // GET /api/comments?postId=123
 export async function GET(req: Request) {
@@ -18,9 +22,10 @@ export async function GET(req: Request) {
     }
 
     // Find comments for a specific post
-    const comments = await Comment.find({ post: postId })
-      .populate("author", "firstName lastName ppUrl") // populate user info
-      .sort({ createdAt: -1 }); // newest first
+    // const comments = await Comment.find({ post: postId })
+    //   .populate("author", "firstName lastName ppUrl") // populate user info
+    //   .sort({ createdAt: -1 }); // newest first
+    const comments = await getAllDataByPostId(postId);
 
     return NextResponse.json(comments, { status: 200 });
   } catch (err: any) {
@@ -47,10 +52,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const newComment = await Comment.create({
-      author,
-      post,
+    // const newComment = await Comment.create({
+    //   author,
+    //   post,
+    //   content,
+    // });
+
+    const newComment = await createComment({
       content,
+      post: post.toString(),
+      author: author.toString(),
+      reactions: [],
     });
 
     return NextResponse.json(newComment, { status: 201 });
